@@ -2,31 +2,41 @@
     display: grid;
     align-items: center;
     justify-items: center;
+    width: 100%;
     height: 100%;
     background-color: #E4E4E1;
     background-image: radial-gradient(at top center, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0.03) 100%), linear-gradient(to top, rgba(255, 255, 255, 0.3) 0%, rgba(88, 95, 99, 0.8) 100%);
     background-blend-mode: normal, multiply;
 }
 
+/* 
+
+这里关于自适应，有一个大问题，为什么flex布局正常自适应，grid布局不正常自适应
+能判断的是，如果box把创建three的代码注释，是正常的
+*/
 .background .container {
-    display: grid;
+    /* display: grid;
     grid-template-columns: 0.25fr 0.75fr;
-    grid-template-rows: 1fr;
+    grid-template-rows: 1fr; */
+    display: flex;
+    flex-direction: row; 
     height: 86%;
     width: 86%;
     border: 1px solid rgba(88, 95, 99, 0.3);
     border-radius: 15px;
-    overflow: auto;
+    overflow: hidden;
 }
 
 .background .container .sidebarContainer {
-    /* width: 100%;
-    height: 100%; */
+    width: 30%;
+    /* width: 100%; */
+    height: 100%;
     background-color: rgb(43, 40, 40);
 }
 
 .background .container .boxContainer {
     /* background-color: rgb(164, 170, 182); */
-    /* width: 100%;
-    height: 100%; */
+    width: 70%;
+    /* width: 100%; */
+    height: 100%;
 }

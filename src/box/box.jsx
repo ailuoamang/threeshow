@@ -51,7 +51,7 @@ export default function Box() {
                 //这里通过window的resize函数监听
                 //发现会出现缩小,container的宽不随window变化,放大会变化，但是会闪回
                 //个人判断是这些css自适应规则发生了冲突以及一些先后顺序
-                //经过查询决定采用另一个可以监听任意元素变化的方法ResizeObserver
+                //经过查询决定采用另一个可以监听任意元素变化的方法ResizeObserver，这个方法会导致three.js不渲染
                 //three.js的官网解决方式是侧边栏使用了iframe,我没法在这里使用
                 console.log('页面发生缩放',window.innerWidth,container.clientWidth);
                 size.width=container.clientWidth;
@@ -61,10 +61,21 @@ export default function Box() {
                 //更新相机的投影矩阵
                 camera.updateProjectionMatrix();
                 //更新渲染器尺寸
-                // renderer.setSize(size.width, size.height)
+                renderer.setSize(size.width, size.height)
             })
 
-            
+            // const resizeObserver = new ResizeObserver(() => {
+            //     const newWidth = container.clientWidth;
+            //     const newHeight = container.clientHeight;
+            //     console.log('容器大小变化', newWidth, newHeight);
+            // });
+        
+            // resizeObserver.observe(container);
+        
+            // return () => {
+            //     resizeObserver.disconnect();
+            //     renderer.dispose();
+            // };
         }
     }, [])
     return (
