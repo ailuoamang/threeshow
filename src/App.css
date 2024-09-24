@@ -10,7 +10,6 @@
 }
 
 /* 
-
 这里关于自适应，有一个大问题，为什么flex布局正常自适应，grid布局不正常自适应
 能判断的是，如果box把创建three的代码注释，是正常的
 */
@@ -22,7 +21,7 @@
     flex-direction: row; 
     height: 86%;
     width: 86%;
-    border: 1px solid rgba(88, 95, 99, 0.3);
+    border: 1px solid rgba(3, 3, 3, 0.3);
     border-radius: 15px;
     overflow: hidden;
 }

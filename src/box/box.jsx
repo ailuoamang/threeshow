@@ -9,8 +9,8 @@ export default function Box() {
             // dom节点
             const container = document.getElementById('sceneContainer');
             const size={
-                width:container.clientWidth,
-                height:container.clientHeight
+                width:container.getBoundingClientRect().width,
+                height:container.getBoundingClientRect().height
             }
 
             sceneRef.current= new Three.Scene();
@@ -32,8 +32,6 @@ export default function Box() {
             renderer.setPixelRatio(window.devicePixelRatio)
     
             container.append(renderer.domElement);
-    
-            //renderer.render(sceneRef.current, camera)
 
             const animate=()=>{
                 // console.log('帧渲染',container.clientWidth)
@@ -47,6 +45,7 @@ export default function Box() {
             renderer.setAnimationLoop(animate);
 
             window.addEventListener('resize',()=>{
+                console.log(container.getBoundingClientRect())
                 //我这里与其他项目不同的是，渲染器并不是直接绑定在body元素上的，而是某个子元素
                 //这里通过window的resize函数监听
                 //发现会出现缩小,container的宽不随window变化,放大会变化，但是会闪回
@@ -54,8 +53,8 @@ export default function Box() {
                 //经过查询决定采用另一个可以监听任意元素变化的方法ResizeObserver，这个方法会导致three.js不渲染
                 //three.js的官网解决方式是侧边栏使用了iframe,我没法在这里使用
                 console.log('页面发生缩放',window.innerWidth,container.clientWidth);
-                size.width=container.clientWidth;
-                size.height=container.clientHeight;
+                size.width=container.getBoundingClientRect().width;
+                size.height=container.getBoundingClientRect().height;
                 //更新相机宽高比
                 camera.aspect=size.width/size.height;
                 //更新相机的投影矩阵
@@ -63,19 +62,13 @@ export default function Box() {
                 //更新渲染器尺寸
                 renderer.setSize(size.width, size.height)
             })
-
-            // const resizeObserver = new ResizeObserver(() => {
-            //     const newWidth = container.clientWidth;
-            //     const newHeight = container.clientHeight;
-            //     console.log('容器大小变化', newWidth, newHeight);
-            // });
         
-            // resizeObserver.observe(container);
-        
-            // return () => {
-            //     resizeObserver.disconnect();
-            //     renderer.dispose();
-            // };
+            return () => {
+                // 清除渲染器
+                console.log('已清除')
+                // renderer.dispose();
+                // sceneRef.current=null;
+            };
         }
     }, [])
     return (
