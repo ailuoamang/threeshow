@@ -2,9 +2,10 @@ import * as Three from 'three'
 
 //他可以继承一个抽象类，定义了这两个函数
 export default class RotateMeshScene {
-
     #renderer;
     #scene;
+    #geometry;
+    #material;
     #cube;
     camera;
     constructor(renderer) {
@@ -18,9 +19,9 @@ export default class RotateMeshScene {
         this.camera.position.set(0, 0, 10);
 
         //立方体
-        const geometry = new Three.BoxGeometry(1, 1, 1);
-        const material = new Three.MeshBasicMaterial();
-        this.#cube = new Three.Mesh(geometry, material);
+        this.#geometry = new Three.BoxGeometry(1, 1, 1);
+        this.#material = new Three.MeshBasicMaterial();
+        this.#cube = new Three.Mesh(this.#geometry, this.#material);
 
         this.#scene.add(this.#cube);
 
@@ -28,6 +29,8 @@ export default class RotateMeshScene {
     }
     disposeScene() {
         // todo
+        this.#geometry.dispose();
+        this.#material.dispose();
     }
     #animate(object) {
         // console.log('帧渲染',container.clientWidth)
