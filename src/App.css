@@ -19,23 +19,28 @@
     grid-template-rows: 1fr; */
     display: flex;
     flex-direction: row; 
-    height: 86%;
-    width: 86%;
-    border: 1px solid rgba(3, 3, 3, 0.3);
+    height: 87%;
+    width: 95%;
+    /* border: 1px solid rgba(3, 3, 3, 0.3); */
     border-radius: 15px;
     overflow: hidden;
 }
 
 .background .container .sidebarContainer {
-    width: 30%;
+    width: 20%;
     /* width: 100%; */
     height: 100%;
-    background-color: rgb(43, 40, 40);
+    background-color: rgb(126, 128, 127);
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    background: url(../public/background3.jpg);
+    background-size: cover;
 }
 
 .background .container .boxContainer {
     /* background-color: rgb(164, 170, 182); */
-    width: 70%;
+    width: 80%;
     /* width: 100%; */
     height: 100%;
 }

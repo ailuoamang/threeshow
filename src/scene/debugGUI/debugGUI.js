@@ -1,7 +1,7 @@
 import * as Three from 'three'
 
 //他可以继承一个抽象类，定义了这两个函数
-export default class RotateMeshScene {
+export default class DebugGUIScene {
 
     #renderer;
     #scene;
@@ -18,7 +18,7 @@ export default class RotateMeshScene {
         this.camera.position.set(0, 0, 10);
 
         //立方体
-        const geometry = new Three.BoxGeometry(1, 1, 1);
+        const geometry = new Three.BoxGeometry(4, 1, 1);
         const material = new Three.MeshBasicMaterial();
         this.#cube = new Three.Mesh(geometry, material);
 
