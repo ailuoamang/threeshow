@@ -1,48 +1,27 @@
 import React, { useEffect,useRef } from 'react'
 import * as Three from 'three'
+import RotateMeshScene from '../scene/rotatemesh/rotateMesh';
 
 export default function Box() {
-    const sceneRef=useRef(null);
+    const rendererRef=useRef(null);
     useEffect(() => {
-        if(sceneRef.current===null){
+        if(rendererRef.current===null){
             console.log('执行一次')
             // dom节点
             const container = document.getElementById('sceneContainer');
+            const canvas=document.getElementById('canvas');
             const size={
                 width:container.getBoundingClientRect().width,
                 height:container.getBoundingClientRect().height
             }
-
-            sceneRef.current= new Three.Scene();
-            
-            //相机
-            const camera = new Three.PerspectiveCamera(75, size.width/ size.height, 0.1, 100);
-            camera.position.set(0, 0, 10);
-    
-            //立方体
-            const geometry = new Three.BoxGeometry(1, 1, 1);
-            const material = new Three.MeshBasicMaterial();
-            const cube = new Three.Mesh(geometry, material);
-    
-            sceneRef.current.add(cube);
     
             //渲染器
-            const renderer = new Three.WebGLRenderer();
-            renderer.setSize(size.width, size.height);
-            renderer.setPixelRatio(window.devicePixelRatio)
-    
-            container.append(renderer.domElement);
+            rendererRef.current = new Three.WebGLRenderer({"canvas":canvas});
+            rendererRef.current.setSize(size.width, size.height);
+            rendererRef.current.setPixelRatio(window.devicePixelRatio);
 
-            const animate=()=>{
-                // console.log('帧渲染',container.clientWidth)
-                cube.rotation.x+=0.01;
-                cube.rotation.y+=0.01;
-                //渲染器帧渲染场景和相机
-                renderer.render(sceneRef.current, camera);
-            }
-
-            //动画循环
-            renderer.setAnimationLoop(animate);
+            let rotateMeshScene=new RotateMeshScene(rendererRef.current);
+            rotateMeshScene.createScene(size);
 
             window.addEventListener('resize',()=>{
                 console.log(container.getBoundingClientRect())
@@ -56,22 +35,21 @@ export default function Box() {
                 size.width=container.getBoundingClientRect().width;
                 size.height=container.getBoundingClientRect().height;
                 //更新相机宽高比
-                camera.aspect=size.width/size.height;
+                rotateMeshScene.camera.aspect=size.width/size.height;
                 //更新相机的投影矩阵
-                camera.updateProjectionMatrix();
+                rotateMeshScene.camera.updateProjectionMatrix();
                 //更新渲染器尺寸
-                renderer.setSize(size.width, size.height)
+                rendererRef.current.setSize(size.width, size.height)
             })
         
             return () => {
-                // 清除渲染器
                 console.log('已清除')
-                // renderer.dispose();
-                // sceneRef.current=null;
             };
         }
     }, [])
     return (
-        <div id='sceneContainer' style={{"height":"100%","width":"100%"}}></div>
+        <div id='sceneContainer' style={{"height":"100%","width":"100%"}}>
+            <canvas id='canvas' style={{"height":"100%","width":"100%"}}></canvas>
+        </div>
     )
 }
