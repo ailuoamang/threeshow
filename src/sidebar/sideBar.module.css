@@ -30,8 +30,9 @@
 }
 
 .container .item .description{
-    color: rgb(177, 173, 173);
+    color: rgb(151, 184, 91);
     font-size: 13px;
+    padding-top: 10px;
 }
 
 ::-webkit-scrollbar {

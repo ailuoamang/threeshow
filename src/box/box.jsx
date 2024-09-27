@@ -67,7 +67,8 @@ export default function Box({ sceneId }) {
         })
     }, [sceneId])
     return (
-        <div id='sceneContainer' style={{ "height": "100%", "width": "100%" }}>
+        <div id='sceneContainer' style={{ "height": "100%", "width": "100%","position":"relative" }}>
+            <div id='pannel' style={{'position':"absolute","top":"15px","right":"50px"}}></div>
             <canvas id='canvas' style={{ "height": "100%", "width": "100%" }}></canvas>
         </div>
     )
