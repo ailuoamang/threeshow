@@ -7,6 +7,7 @@ export default class RotateMeshScene {
     #renderer;
     #gui;
     #scene;
+    #axesHelper;
     #geometry;
     #material;
     #cube;
@@ -19,6 +20,7 @@ export default class RotateMeshScene {
         const params={
             "color":"#85ca72",
             "wireframe":false,
+            "axesHelper":false
         }
 
         //scene
@@ -59,11 +61,23 @@ export default class RotateMeshScene {
         .add(this.#cube.position,'y',-10,10,0.001)
         this.#gui
         .add(this.#cube.position,'z',-10,10,0.001)
+
+        this.#axesHelper = new Three.AxesHelper( 5 );
+        this.#gui
+        .add(params,'axesHelper')
+        .onChange(v=>{
+            if(v){
+                this.#scene.add( this.#axesHelper );
+            }else{
+                this.#scene.remove(this.#axesHelper)
+            }
+        })
     }
     disposeScene() {
         // todo
         this.#geometry.dispose();
         this.#material.dispose();
+        this.#axesHelper.dispose();
         this.#gui.destroy();
     }
     #animate(object) {
