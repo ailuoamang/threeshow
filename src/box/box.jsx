@@ -19,7 +19,7 @@ export default function Box({ sceneId }) {
         if (rendererRef.current === null) {
             console.log('创建renderer')
             //渲染器
-            rendererRef.current = new Three.WebGLRenderer({ "canvas": canvas });
+            rendererRef.current = new Three.WebGLRenderer({ "canvas": canvas,antialias: true });
             rendererRef.current.setSize(sizeRef.current.width, sizeRef.current.height);
             rendererRef.current.setPixelRatio(window.devicePixelRatio);
         }

@@ -9,18 +9,21 @@ export default class RotateMeshScene {
     #scene;
     #axesHelper;
     #geometry;
-    #material;
-    #cube;
+    #meshMaterial;
+    #LineMaterial;
+    #cubeFace;
+    #cubeLine;
     camera;
     constructor(renderer) {
         this.#renderer = renderer;
     }
     createScene(size) {
         //场景参数
-        const params={
-            "color":"#85ca72",
-            "wireframe":false,
-            "axesHelper":false
+        const params = {
+            "color": "#294e6b",
+            "wireframe": false,
+            "axesHelper": false,
+            "fog":false
         }
 
         //scene
@@ -28,55 +31,83 @@ export default class RotateMeshScene {
 
         //相机
         this.camera = new Three.PerspectiveCamera(75, size.width / size.height, 0.1, 100);
-        this.camera.position.set(0, 0, 10);
+        this.camera.position.set(0, 0, 7);
 
         //控制器
-        const controls = new OrbitControls( this.camera, this.#renderer.domElement);
+        const controls = new OrbitControls(this.camera, this.#renderer.domElement);
         controls.update();
 
-        //立方体
-        this.#geometry = new Three.BoxGeometry(4, 1, 1);
-        this.#material = new Three.MeshBasicMaterial({"color":params.color});
-        this.#cube = new Three.Mesh(this.#geometry, this.#material);
+        //立方体组
+        const group = new Three.Group();
+        this.#geometry = new Three.BoxGeometry(4, 1, 1, 1, 1, 1);
+        this.#meshMaterial = new Three.MeshBasicMaterial({ "color": params.color });
+        this.#LineMaterial = new Three.LineBasicMaterial({ "color": "#81b0d5" });
 
-        this.#scene.add(this.#cube);
+        this.#cubeFace = new Three.Mesh(this.#geometry, this.#meshMaterial);
+        //new Three.Line(this.#geometry, this.#LineMaterial);
+        this.#cubeLine = new Three.Line(this.#geometry, this.#LineMaterial);
 
-        this.#renderer.setAnimationLoop(() => this.#animate(this.#cube))
+        group.add(this.#cubeFace, this.#cubeLine)
+
+        this.#scene.add(group);
+        
+        //fog
+        const fog=new Three.Fog(new Three.Color('#9c55af'), 5, 10);
+
+        this.#renderer.setAnimationLoop(() => this.#animate(this.#cubeFace))
 
         //gui
-        this.#gui=new GUI({container:document.getElementById('pannel')});
+        this.#gui = new GUI({ container: document.getElementById('pannel') });
+        //mesh颜色
         this.#gui
-        .addColor(params,'color')
-        .onChange(v=>{
-            this.#material.color.set(v)
-        })
+            .addColor(params, 'color')
+            .onChange(v => {
+                this.#meshMaterial.color.set(v)
+            })
+        //wireframe
         this.#gui
-        .add(params,'wireframe')
-        .onChange(v=>{
-            this.#material.wireframe=v;
-        })
+            .add(params, 'wireframe')
+            .onChange(v => {
+                this.#meshMaterial.wireframe = v;
+            })
+        
+        //xyz
         this.#gui
-        .add(this.#cube.position,'x',-10,10,0.001)
+            .add(this.#cubeFace.position, 'x', -10, 10, 0.001)
         this.#gui
-        .add(this.#cube.position,'y',-10,10,0.001)
+            .add(this.#cubeFace.position, 'y', -10, 10, 0.001)
         this.#gui
-        .add(this.#cube.position,'z',-10,10,0.001)
-
-        this.#axesHelper = new Three.AxesHelper( 5 );
+            .add(this.#cubeFace.position, 'z', -10, 10, 0.001)
+        
+        //辅助线
+        this.#axesHelper = new Three.AxesHelper(5);
         this.#gui
-        .add(params,'axesHelper')
-        .onChange(v=>{
-            if(v){
-                this.#scene.add( this.#axesHelper );
-            }else{
-                this.#scene.remove(this.#axesHelper)
-            }
-        })
+            .add(params, 'axesHelper')
+            .onChange(v => {
+                if (v) {
+                    this.#scene.add(this.#axesHelper);
+                } else {
+                    this.#scene.remove(this.#axesHelper)
+                }
+            })
+        
+        //fog
+        this.#gui
+            .add(params,'fog')
+            .onChange(v=>{
+                if(v){
+                    this.#scene.fog=fog;
+                }else{
+                    this.#scene.fog=null;
+                }
+            })
     }
     disposeScene() {
         // todo
+        this.#scene.fog=null
         this.#geometry.dispose();
-        this.#material.dispose();
+        this.#meshMaterial.dispose();
+        this.#LineMaterial.dispose();
         this.#axesHelper.dispose();
         this.#gui.destroy();
     }
