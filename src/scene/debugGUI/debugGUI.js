@@ -22,6 +22,7 @@ export default class RotateMeshScene {
     createScene(size) {
         //场景参数
         const params = {
+            "meshType":"cubeGroup",
             "color": "#294e6b",
             "wireframe": false,
             "axesHelper": false,
@@ -34,6 +35,9 @@ export default class RotateMeshScene {
         //相机
         this.camera = new THREE.PerspectiveCamera(75, size.width / size.height, 0.1, 100);
         this.camera.position.set(0, 0, 7);
+        this.camera.layers.enable(0);//添加该层成员
+        this.camera.layers.enable(1);
+        this.camera.layers.toggle(1);
 
         //控制器
         const controls = new OrbitControls(this.camera, this.#renderer.domElement);
@@ -46,8 +50,9 @@ export default class RotateMeshScene {
         this.#LineMaterial = new THREE.LineBasicMaterial({ "color": "#81b0d5" });
 
         this.#cubeFace = new THREE.Mesh(this.#boxGeometry, this.#meshMaterial);
-        //new THREE.Line(this.#boxGeometry, this.#LineMaterial);
+        this.#cubeFace.layers.set(0);//设置成员为层，并删除所有其他层的成员
         this.#cubeLine = new THREE.Line(this.#boxGeometry, this.#LineMaterial);
+        this.#cubeLine.layers.set(0);
 
         group.add(this.#cubeFace, this.#cubeLine)
 
@@ -56,6 +61,7 @@ export default class RotateMeshScene {
         //环面节
         this.#torusKnotGeometry= new THREE.TorusKnotGeometry();
         this.#toruszknot= new THREE.Mesh(this.#torusKnotGeometry,this.#meshMaterial);
+        this.#toruszknot.layers.set(1);
         this.#scene.add(this.#toruszknot)
 
 
@@ -66,6 +72,19 @@ export default class RotateMeshScene {
 
         //gui
         this.#gui = new GUI({ container: document.getElementById('pannel') });
+        //mesh
+        this.#gui
+            .add(params,'meshType',['cubeGroup','torusKnot'])
+            .onChange(v=>{
+                console.log(this.#scene);
+                if(v==='cubeGroup'){
+                    this.camera.layers.toggle(0);//切换图层成员
+                    this.camera.layers.toggle(1);
+                }else if(v==="torusKnot"){
+                    this.camera.layers.toggle(0)
+                    this.camera.layers.toggle(1);
+                }
+            })
         //mesh颜色
         this.#gui
             .addColor(params, 'color')
@@ -89,6 +108,9 @@ export default class RotateMeshScene {
 
         //辅助线
         this.#axesHelper = new THREE.AxesHelper(5);
+        this.#axesHelper.layers.enable(0);//添加该层成员
+        this.#axesHelper.layers.enable(1);
+
         this.#gui
             .add(params, 'axesHelper')
             .onChange(v => {
