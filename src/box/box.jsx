@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import RotateMeshScene from '../scene/rotatemesh/rotateMesh';
 import DebugGUIScene from '../scene/debugGUI/debugGUI';
+import TextureScene from '../scene/texture/texture';
 
 export default function Box({ sceneId }) {
     const rendererRef = useRef(null);
@@ -42,6 +43,8 @@ export default function Box({ sceneId }) {
             case "DebugGUI":
                 sceneRef.current = new DebugGUIScene(rendererRef.current);
                 break;
+            case "texture":
+                sceneRef.current=new TextureScene(rendererRef.current);
             default:
                 break;
         }
