@@ -59,7 +59,7 @@ export default class RotateMeshScene {
         this.#scene.add(group);
 
         //环面节
-        this.#torusKnotGeometry= new THREE.TorusKnotGeometry();
+        this.#torusKnotGeometry= new THREE.TorusKnotGeometry(1, 0.4, 128, 16);
         this.#toruszknot= new THREE.Mesh(this.#torusKnotGeometry,this.#meshMaterial);
         this.#toruszknot.layers.set(1);
         this.#scene.add(this.#toruszknot)
