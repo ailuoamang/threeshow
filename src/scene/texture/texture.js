@@ -9,25 +9,35 @@ export default class TextureScene {
     #scene;
     camera;
 
-    #textureLoader;
-
     #geometry;
-    #leatherArmorTexture;
-    #leatherDiamondPatchesTexture;
     #leatherArmorMaterial;
     #leatherDiamondPatchesMaterial;
     #cube;
 
     constructor(renderer) {
         this.#renderer = renderer;
-        this.#textureLoader = new THREE.TextureLoader();
-        this.#leatherArmorTexture = this.#textureLoader.load('/texture/leatherArmor/Leather_Armor_003_basecolor.png');
-        this.#leatherDiamondPatchesTexture = this.#textureLoader.load('/texture/leatherDiamondPatches/Leather_Diamond_Patches_002_basecolor.jpg');
+        const loadingManager=new THREE.LoadingManager();
+        loadingManager.onStart=(url, itemsLoaded, itemsTotal)=>{
+            console.log('开始加载',url, itemsLoaded, itemsTotal)
+        }
+        loadingManager.onProgress=(url, itemsLoaded, itemsTotal)=>{
+            console.log('加载中',url, itemsLoaded, itemsTotal);
+        }
+        loadingManager.onLoad=()=>{
+            console.log('加载完成')
+        }
+        loadingManager.onError=(url)=>{
+            console.log('有错误',url)
+        }
+
+        const textureLoader = new THREE.TextureLoader(loadingManager);
+        const leatherArmorTexture = textureLoader.load('/texture/leatherArmor/Leather_Armor_003_basecolor.png');
+        const leatherDiamondPatchesTexture = textureLoader.load('/texture/leatherDiamondPatches/Leather_Diamond_Patches_002_basecolor.jpg');
         this.#leatherArmorMaterial = new THREE.MeshBasicMaterial({
-            map: this.#leatherArmorTexture,
+            map: leatherArmorTexture,
         })
         this.#leatherDiamondPatchesMaterial = new THREE.MeshBasicMaterial({
-            map: this.#leatherDiamondPatchesTexture
+            map: leatherDiamondPatchesTexture
         })
     }
     createScene(size) {
