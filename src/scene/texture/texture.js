@@ -10,40 +10,55 @@ export default class TextureScene {
     camera;
 
     #geometry;
+    #currentTexture;
+    #leatherArmorTexture;
+    #leatherDiamondPatchesTexture;
     #leatherArmorMaterial;
     #leatherDiamondPatchesMaterial;
     #cube;
 
     constructor(renderer) {
         this.#renderer = renderer;
-        const loadingManager=new THREE.LoadingManager();
-        loadingManager.onStart=(url, itemsLoaded, itemsTotal)=>{
-            console.log('开始加载',url, itemsLoaded, itemsTotal)
+        const loadingManager = new THREE.LoadingManager();
+        loadingManager.onStart = (url, itemsLoaded, itemsTotal) => {
+            console.log('开始加载', url, itemsLoaded, itemsTotal)
         }
-        loadingManager.onProgress=(url, itemsLoaded, itemsTotal)=>{
-            console.log('加载中',url, itemsLoaded, itemsTotal);
+        loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
+            console.log('加载中', url, itemsLoaded, itemsTotal);
         }
-        loadingManager.onLoad=()=>{
+        loadingManager.onLoad = () => {
             console.log('加载完成')
         }
-        loadingManager.onError=(url)=>{
-            console.log('有错误',url)
+        loadingManager.onError = (url) => {
+            console.log('有错误', url)
         }
 
         const textureLoader = new THREE.TextureLoader(loadingManager);
-        const leatherArmorTexture = textureLoader.load('/texture/leatherArmor/Leather_Armor_003_basecolor.png');
-        const leatherDiamondPatchesTexture = textureLoader.load('/texture/leatherDiamondPatches/Leather_Diamond_Patches_002_basecolor.jpg');
+
+        this.#leatherArmorTexture = textureLoader.load('/texture/leatherArmor/Leather_Armor_003_basecolor.png');
+        this.#leatherArmorTexture.wrapS=THREE.RepeatWrapping;
+        this.#leatherArmorTexture.wrapT=THREE.RepeatWrapping;
+
+        this.#leatherDiamondPatchesTexture = textureLoader.load('/texture/leatherDiamondPatches/Leather_Diamond_Patches_002_basecolor.jpg');
+        this.#leatherDiamondPatchesTexture.wrapS=THREE.RepeatWrapping;
+        this.#leatherDiamondPatchesTexture.wrapT=THREE.RepeatWrapping;
+
         this.#leatherArmorMaterial = new THREE.MeshBasicMaterial({
-            map: leatherArmorTexture,
+            map: this.#leatherArmorTexture,
         })
         this.#leatherDiamondPatchesMaterial = new THREE.MeshBasicMaterial({
-            map: leatherDiamondPatchesTexture
+            map: this.#leatherDiamondPatchesTexture
         })
+        console.log(this.#leatherArmorMaterial)
     }
     createScene(size) {
         //场景参数
         const params = {
             textureType: 'leatherArmor',//type起得不好，之后改一个单词
+            textureParams:{
+                "x":1,
+                "y":1
+            }
         }
 
         //scene
@@ -60,6 +75,7 @@ export default class TextureScene {
 
         //球体
         this.#geometry = new THREE.CylinderGeometry(3, 3, 12, 32);
+        this.#currentTexture = this.#leatherArmorTexture;
         this.#cube = new THREE.Mesh(this.#geometry, this.#leatherArmorMaterial);
 
         this.#scene.add(this.#cube);
@@ -73,12 +89,37 @@ export default class TextureScene {
             .add(params, 'textureType', ['leatherArmor', 'leatherDiamondPatches'])
             .onChange(value => {
                 console.log(value);
+                this.#gui.controllers.map(v=>{
+                    if(v.name==='a'){
+                        v.reset();
+                    }
+                })
+                this.#currentTexture.repeat.x=1;
+                this.#currentTexture.repeat.y=1;
+                console.log('gui',this.#gui)
                 if (value === 'leatherDiamondPatches') {
                     this.#cube.material = this.#leatherDiamondPatchesMaterial;
+                    this.#currentTexture = this.#leatherDiamondPatchesTexture;
                 } else if (value === 'leatherArmor') {
                     this.#cube.material = this.#leatherArmorMaterial;
+                    this.#currentTexture = this.#leatherArmorTexture;
                 }
             });
+        //控制纹理属性
+        const a=this.#gui
+            .add(params.textureParams, 'x',1,10,1)
+            .onChange(v=>{
+                console.log(v)
+                this.#currentTexture.repeat.x=v;
+            })
+        a.name='a';
+        const b=this.#gui
+            .add(params.textureParams, 'y',1,10,1)
+            .onChange(v=>{
+                console.log(v)
+                this.#currentTexture.repeat.y=v;
+            })
+        b.name='a';
     }
     disposeScene() {
         this.#geometry.dispose();
