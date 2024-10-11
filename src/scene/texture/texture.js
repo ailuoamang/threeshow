@@ -36,12 +36,12 @@ export default class TextureScene {
         const textureLoader = new THREE.TextureLoader(loadingManager);
 
         this.#leatherArmorTexture = textureLoader.load('/texture/leatherArmor/Leather_Armor_003_basecolor.png');
-        this.#leatherArmorTexture.wrapS=THREE.RepeatWrapping;
-        this.#leatherArmorTexture.wrapT=THREE.RepeatWrapping;
+        this.#leatherArmorTexture.wrapS = THREE.RepeatWrapping;
+        this.#leatherArmorTexture.wrapT = THREE.RepeatWrapping;
 
         this.#leatherDiamondPatchesTexture = textureLoader.load('/texture/leatherDiamondPatches/Leather_Diamond_Patches_002_basecolor.jpg');
-        this.#leatherDiamondPatchesTexture.wrapS=THREE.RepeatWrapping;
-        this.#leatherDiamondPatchesTexture.wrapT=THREE.RepeatWrapping;
+        this.#leatherDiamondPatchesTexture.wrapS = THREE.RepeatWrapping;
+        this.#leatherDiamondPatchesTexture.wrapT = THREE.RepeatWrapping;
 
         this.#leatherArmorMaterial = new THREE.MeshBasicMaterial({
             map: this.#leatherArmorTexture,
@@ -55,9 +55,9 @@ export default class TextureScene {
         //场景参数
         const params = {
             textureType: 'leatherArmor',//type起得不好，之后改一个单词
-            textureParams:{
-                "x":1,
-                "y":1
+            textureParams: {
+                "x": 1,
+                "y": 1
             }
         }
 
@@ -89,14 +89,21 @@ export default class TextureScene {
             .add(params, 'textureType', ['leatherArmor', 'leatherDiamondPatches'])
             .onChange(value => {
                 console.log(value);
-                this.#gui.controllers.map(v=>{
-                    if(v.name==='textureParam'){
-                        v.reset();
+                console.log('gui', this.#gui)
+
+                for (let i = 0; i < this.#gui.folders.length; i++) {
+                    const folder = this.#gui.folders[i];
+                    for (let j = 0; j < folder.controllers.length; j++) {
+                        const controller = folder.controllers[i];
+                        if(controller.name==='textureParam'){
+                            console.log('重置属性')
+                            controller.reset();
+                        }
                     }
-                })
-                this.#currentTexture.repeat.x=1;
-                this.#currentTexture.repeat.y=1;
-                console.log('gui',this.#gui)
+                }
+                this.#currentTexture.repeat.x = 1;
+                this.#currentTexture.repeat.y = 1;
+
                 if (value === 'leatherDiamondPatches') {
                     this.#cube.material = this.#leatherDiamondPatchesMaterial;
                     this.#currentTexture = this.#leatherDiamondPatchesTexture;
@@ -106,20 +113,22 @@ export default class TextureScene {
                 }
             });
         //控制纹理属性
-        const a=this.#gui
-            .add(params.textureParams, 'x',1,10,1)
-            .onChange(v=>{
+        //这里a叫controller好一点，但是这里的命名又没什么特别的意义
+        const folder = this.#gui.addFolder('textureRepeat')
+        const controllerA = folder
+            .add(params.textureParams, 'x', 1, 10, 1)
+            .onChange(v => {
                 console.log(v)
-                this.#currentTexture.repeat.x=v;
+                this.#currentTexture.repeat.x = v;
             })
-        a.name='textureParam';
-        const b=this.#gui
-            .add(params.textureParams, 'y',1,10,1)
-            .onChange(v=>{
+        controllerA.name = 'textureParam';
+        const controllerB = folder
+            .add(params.textureParams, 'y', 1, 10, 1)
+            .onChange(v => {
                 console.log(v)
-                this.#currentTexture.repeat.y=v;
+                this.#currentTexture.repeat.y = v;
             })
-        b.name='textureParam';
+        controllerB.name = 'textureParam';
     }
     disposeScene() {
         this.#geometry.dispose();
