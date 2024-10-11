@@ -55,9 +55,13 @@ export default class TextureScene {
         //场景参数
         const params = {
             textureType: 'leatherArmor',//type起得不好，之后改一个单词
-            textureParams: {
+            textureRepeat: {//这两个属性只有占位符的意义了，是不是有更好的写法
                 "x": 1,
                 "y": 1
+            },
+            textureOffset: {
+                "x": 0,
+                "y": 0
             }
         }
 
@@ -91,18 +95,22 @@ export default class TextureScene {
                 console.log(value);
                 console.log('gui', this.#gui)
 
+                //重置gui
                 for (let i = 0; i < this.#gui.folders.length; i++) {
                     const folder = this.#gui.folders[i];
                     for (let j = 0; j < folder.controllers.length; j++) {
-                        const controller = folder.controllers[i];
-                        if(controller.name==='textureParam'){
+                        const controller = folder.controllers[j];
+                        if (controller.name === 'textureParam') {
                             console.log('重置属性')
                             controller.reset();
                         }
                     }
                 }
+                //重置gui对应的属性
                 this.#currentTexture.repeat.x = 1;
                 this.#currentTexture.repeat.y = 1;
+                this.#currentTexture.offset.x = 0;
+                this.#currentTexture.offset.y = 0;
 
                 if (value === 'leatherDiamondPatches') {
                     this.#cube.material = this.#leatherDiamondPatchesMaterial;
@@ -113,22 +121,44 @@ export default class TextureScene {
                 }
             });
         //控制纹理属性
-        //这里a叫controller好一点，但是这里的命名又没什么特别的意义
-        const folder = this.#gui.addFolder('textureRepeat')
-        const controllerA = folder
-            .add(params.textureParams, 'x', 1, 10, 1)
+        //repeat
+        const folderA = this.#gui.addFolder('textureRepeat');
+
+        const controllerAA = folderA
+            .add(params.textureRepeat, 'x', 1, 10, 1)
             .onChange(v => {
                 console.log(v)
                 this.#currentTexture.repeat.x = v;
             })
-        controllerA.name = 'textureParam';
-        const controllerB = folder
-            .add(params.textureParams, 'y', 1, 10, 1)
+        controllerAA.name = 'textureParam';
+
+        const controllerAB = folderA
+            .add(params.textureRepeat, 'y', 1, 10, 1)
             .onChange(v => {
                 console.log(v)
                 this.#currentTexture.repeat.y = v;
             })
-        controllerB.name = 'textureParam';
+        controllerAB.name = 'textureParam';
+
+        //offset
+        const folderB = this.#gui.addFolder('textureOffset');
+
+        const controllerBA = folderB
+            .add(params.textureOffset, 'x', 0, 1, 0.1)
+            .onChange(v => {
+                console.log(v)
+                this.#currentTexture.offset.x = v;
+            })
+        controllerBA.name = 'textureParam';
+
+        const controllerBB = folderB
+            .add(params.textureOffset, 'y', 0, 1, 0.1)
+            .onChange(v => {
+                console.log(v)
+                this.#currentTexture.offset.y = v;
+            })
+        controllerBB.name = 'textureParam';
+
     }
     disposeScene() {
         this.#geometry.dispose();
