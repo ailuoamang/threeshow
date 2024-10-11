@@ -146,11 +146,12 @@ export default class TextureScene {
         this.#renderer.render(this.#scene, this.camera);
     }
     //gui controller
-    #createController(parent, parentName, params, callback) {
+    //啧应该用ts的，可以加点类型
+    #createController(parent, controllerName, params, callback) {
         const controller = parent
             .add(...params)
             .onChange(callback)
-        parent.name = parentName;
+        parent.name = controllerName;
         return controller;
     }
 }
