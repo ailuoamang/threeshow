@@ -88,76 +88,49 @@ export default class TextureScene {
 
         //gui
         this.#gui = new GUI({ container: document.getElementById('pannel') });
-        //纹理
-        this.#gui
-            .add(params, 'textureType', ['leatherArmor', 'leatherDiamondPatches'])
-            .onChange(value => {
-                console.log(value);
-                console.log('gui', this.#gui)
+        //纹理类型
+        //啧我想把handlechnage写在下面的，符合顺序
+        const handleChange = (value) => {
+            console.log(value);
+            console.log('gui', this.#gui)
 
-                //重置gui
-                for (let i = 0; i < this.#gui.folders.length; i++) {
-                    const folder = this.#gui.folders[i];
-                    for (let j = 0; j < folder.controllers.length; j++) {
-                        const controller = folder.controllers[j];
-                        if (controller.name === 'textureParam') {
-                            console.log('重置属性')
-                            controller.reset();
-                        }
+            //重置gui
+            for (let i = 0; i < this.#gui.folders.length; i++) {
+                const folder = this.#gui.folders[i];
+                for (let j = 0; j < folder.controllers.length; j++) {
+                    const controller = folder.controllers[j];
+                    if (controller.name === 'textureParam') {
+                        console.log('重置属性')
+                        controller.reset();
                     }
                 }
-                //重置gui对应的属性
-                this.#currentTexture.repeat.x = 1;
-                this.#currentTexture.repeat.y = 1;
-                this.#currentTexture.offset.x = 0;
-                this.#currentTexture.offset.y = 0;
+            }
+            //重置gui对应的属性
+            this.#currentTexture.repeat.x = 1;
+            this.#currentTexture.repeat.y = 1;
+            this.#currentTexture.offset.x = 0;
+            this.#currentTexture.offset.y = 0;
 
-                if (value === 'leatherDiamondPatches') {
-                    this.#cube.material = this.#leatherDiamondPatchesMaterial;
-                    this.#currentTexture = this.#leatherDiamondPatchesTexture;
-                } else if (value === 'leatherArmor') {
-                    this.#cube.material = this.#leatherArmorMaterial;
-                    this.#currentTexture = this.#leatherArmorTexture;
-                }
-            });
-        //控制纹理属性
+            if (value === 'leatherDiamondPatches') {
+                this.#cube.material = this.#leatherDiamondPatchesMaterial;
+                this.#currentTexture = this.#leatherDiamondPatchesTexture;
+            } else if (value === 'leatherArmor') {
+                this.#cube.material = this.#leatherArmorMaterial;
+                this.#currentTexture = this.#leatherArmorTexture;
+            }
+        }
+        this.#createController(this.#gui, 'textureType',[params,'textureType', ['leatherArmor', 'leatherDiamondPatches']], handleChange);
+
+        //纹理属性
         //repeat
         const folderA = this.#gui.addFolder('textureRepeat');
-
-        const controllerAA = folderA
-            .add(params.textureRepeat, 'x', 1, 10, 1)
-            .onChange(v => {
-                console.log(v)
-                this.#currentTexture.repeat.x = v;
-            })
-        controllerAA.name = 'textureParam';
-
-        const controllerAB = folderA
-            .add(params.textureRepeat, 'y', 1, 10, 1)
-            .onChange(v => {
-                console.log(v)
-                this.#currentTexture.repeat.y = v;
-            })
-        controllerAB.name = 'textureParam';
+        this.#createController(folderA, 'textureParam', [params.textureRepeat, 'x', 1, 10, 1], (v) => { this.#currentTexture.repeat.x = v });
+        this.#createController(folderA, 'textureParam', [params.textureRepeat, 'y', 1, 10, 1], (v) => { this.#currentTexture.repeat.y = v });
 
         //offset
         const folderB = this.#gui.addFolder('textureOffset');
-
-        const controllerBA = folderB
-            .add(params.textureOffset, 'x', 0, 1, 0.1)
-            .onChange(v => {
-                console.log(v)
-                this.#currentTexture.offset.x = v;
-            })
-        controllerBA.name = 'textureParam';
-
-        const controllerBB = folderB
-            .add(params.textureOffset, 'y', 0, 1, 0.1)
-            .onChange(v => {
-                console.log(v)
-                this.#currentTexture.offset.y = v;
-            })
-        controllerBB.name = 'textureParam';
+        this.#createController(folderB, 'textureParam', [params.textureOffset, 'x', 0, 1, 0.1], (v) => { this.#currentTexture.offset.x = v });
+        this.#createController(folderB, 'textureParam', [params.textureOffset, 'y', 0, 1, 0.1], (v) => { this.#currentTexture.offset.y = v });
 
     }
     disposeScene() {
@@ -171,5 +144,13 @@ export default class TextureScene {
         // object.rotation.y += 0.01;
         //渲染器帧渲染场景和相机
         this.#renderer.render(this.#scene, this.camera);
+    }
+    //gui controller
+    #createController(parent, parentName, params, callback) {
+        const controller = parent
+            .add(...params)
+            .onChange(callback)
+        parent.name = parentName;
+        return controller;
     }
 }
