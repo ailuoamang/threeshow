@@ -90,7 +90,7 @@ export default class TextureScene {
             .onChange(value => {
                 console.log(value);
                 this.#gui.controllers.map(v=>{
-                    if(v.name==='a'){
+                    if(v.name==='textureParam'){
                         v.reset();
                     }
                 })
@@ -112,14 +112,14 @@ export default class TextureScene {
                 console.log(v)
                 this.#currentTexture.repeat.x=v;
             })
-        a.name='a';
+        a.name='textureParam';
         const b=this.#gui
             .add(params.textureParams, 'y',1,10,1)
             .onChange(v=>{
                 console.log(v)
                 this.#currentTexture.repeat.y=v;
             })
-        b.name='a';
+        b.name='textureParam';
     }
     disposeScene() {
         this.#geometry.dispose();
