@@ -62,6 +62,11 @@ export default class TextureScene {
             textureOffset: {
                 "x": 0,
                 "y": 0
+            },
+            textureRoatation: {
+                'angle': 0,
+                'centerX': 0,
+                "centerY": 0
             }
         }
 
@@ -119,7 +124,7 @@ export default class TextureScene {
                 this.#currentTexture = this.#leatherArmorTexture;
             }
         }
-        this.#createController(this.#gui, 'textureType',[params,'textureType', ['leatherArmor', 'leatherDiamondPatches']], handleChange);
+        this.#createController(this.#gui, 'textureType', [params, 'textureType', ['leatherArmor', 'leatherDiamondPatches']], handleChange);
 
         //纹理属性
         //repeat
@@ -132,6 +137,11 @@ export default class TextureScene {
         this.#createController(folderB, 'textureParam', [params.textureOffset, 'x', 0, 1, 0.1], (v) => { this.#currentTexture.offset.x = v });
         this.#createController(folderB, 'textureParam', [params.textureOffset, 'y', 0, 1, 0.1], (v) => { this.#currentTexture.offset.y = v });
 
+        //rotation
+        const folderC = this.#gui.addFolder('textureRotation');
+        this.#createController(folderC, 'textureParam', [params.textureRoatation, 'angle', 0, 360, 1], (v) => { this.#currentTexture.rotation = Math.PI * 2 * (v / 360) });
+        this.#createController(folderC, 'textureParam', [params.textureRoatation, 'centerX', -10, 10, 1], (v) => { this.#currentTexture.center.x = v });
+        this.#createController(folderC, 'textureParam', [params.textureRoatation, 'centerY', -10, 10, 1], (v) => { this.#currentTexture.center.y = v });
     }
     disposeScene() {
         this.#geometry.dispose();
@@ -142,7 +152,7 @@ export default class TextureScene {
     #animate(object) {
         // object.rotation.x += 0.01;
         // object.rotation.y += 0.01;
-        //渲染器帧渲染场景和相机
+        // 渲染器帧渲染场景和相机
         this.#renderer.render(this.#scene, this.camera);
     }
     //gui controller
@@ -151,7 +161,7 @@ export default class TextureScene {
         const controller = parent
             .add(...params)
             .onChange(callback)
-        parent.name = controllerName;
+        controller.name = controllerName;
         return controller;
     }
 }
