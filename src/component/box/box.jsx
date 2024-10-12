@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import RotateMeshScene from '../../scene/rotatemesh/rotateMesh';
 import DebugGUIScene from '../../scene/debugGUI/debugGUI';
 import TextureScene from '../../scene/texture/texture';
+import MaterialScene from '../../scene/material/material';
 
 export default function Box({ sceneId }) {
     const rendererRef = useRef(null);
@@ -45,6 +46,10 @@ export default function Box({ sceneId }) {
                 break;
             case "texture":
                 sceneRef.current=new TextureScene(rendererRef.current);
+                break;
+            case "material":
+                sceneRef.current=new MaterialScene(rendererRef.current);
+                break;
             default:
                 break;
         }

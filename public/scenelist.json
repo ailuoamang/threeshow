@@ -16,9 +16,9 @@
             "description": "包含对立方体不同纹理以及属性的切换"
         },
         {
-            "id": "debugGUI2",
-            "title": "debugGUI",
-            "description": "包含对立方体的属性控制和场景控制器"
+            "id": "material",
+            "title": "material",
+            "description": "包含对材质的使用"
         },
         {
             "id": "debugGUI3",
