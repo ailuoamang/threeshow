@@ -5,6 +5,9 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 // 这个场景使用requestAnimationFrame来实现动画，以作参考
 // 打算演示几个支持灯光的材质,可能加个卡通什么的，不然写起来有点烦
 // todo，这里测试再加个甜甜圈
+// 基于现在的状况，我需要抽象出
+// 包含gui控制的灯光创建类来简化代码编写
+// 后期可能还会抽象一个scene身上的清理方法，如果用强类型语言，还可以用泛型和多继承整点花活，让代码结构美观点
 export default class MaterialScene {
     #renderer;
     #scene;
@@ -17,7 +20,7 @@ export default class MaterialScene {
     #metallicTexture;
     #normalTexture;
     #roughnessTexture;
-    #material;
+    #meshStandardMaterial;
     #cylinder;
 
     requestAnimationFrameID;
@@ -32,14 +35,14 @@ export default class MaterialScene {
         this.#normalTexture = textureLoader.load('/texture/leatherArmor/Leather_Armor_003_normal.png');
         this.#roughnessTexture = textureLoader.load('/texture/leatherArmor/Leather_Armor_003_roughness.png');
 
-        this.#material = new THREE.MeshStandardMaterial({
+        this.#meshStandardMaterial = new THREE.MeshStandardMaterial({
             map: this.#baseColorTexture,
             aoMap: this.#ambientOcclusionTexture,
             normalMap: this.#normalTexture,
             metalnessMap: this.#metallicTexture,
             roughnessMap: this.#roughnessTexture,
         })
-        // this.#material = new THREE.MeshLambertMaterial()
+        // this.#meshStandardMaterial = new THREE.MeshLambertMaterial()
     }
     createScene(size) {
 
@@ -70,7 +73,7 @@ export default class MaterialScene {
 
         //柱体
         this.#geometry = new THREE.CylinderGeometry(3, 3, 12, 32);
-        this.#cylinder = new THREE.Mesh(this.#geometry, this.#material);
+        this.#cylinder = new THREE.Mesh(this.#geometry, this.#meshStandardMaterial);
 
         this.#scene.add(this.#cylinder)
 
@@ -81,11 +84,13 @@ export default class MaterialScene {
     }
     disposeScene() {
         this.#geometry.dispose();
-        this.#material.dispose();//话说dispose了材质会不会自动清理纹理数据呢
+        this.#meshStandardMaterial.dispose();//话说dispose了材质会不会自动清理纹理数据呢，不会，要手动释放
+        //todo 清除纹理，封装成一个公共类吧
+
         window.cancelAnimationFrame(this.requestAnimationFrameID);
     }
     #animate(object, clock) {
-        // const elapsedTime = clock.getElapsedTime();
+        // const elapsedTime = clock.getElapsedTime();增量时间
         // object.rotation.z = elapsedTime;
         // object.rotation.x = elapsedTime;
         this.#renderer.render(this.#scene, this.camera);
