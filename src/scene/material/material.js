@@ -48,8 +48,8 @@ export default class MaterialScene {
             roughnessMap: this.#roughnessTexture,
         })
 
-        this.#meshToonMaterial=new THREE.MeshToonMaterial();
-        
+        this.#meshToonMaterial = new THREE.MeshToonMaterial();
+
     }
     createScene(size) {
 
@@ -85,9 +85,9 @@ export default class MaterialScene {
         this.#scene.add(this.#cylinder)
 
         //圆环
-        this.#TorusGeometry = new THREE.TorusGeometry(8,3,16,100);
-        this.#torus=new THREE.Mesh(this.#TorusGeometry,this.#meshToonMaterial);
-        this.#torus.position.x=-20;
+        this.#TorusGeometry = new THREE.TorusGeometry(8, 3, 16, 100);
+        this.#torus = new THREE.Mesh(this.#TorusGeometry, this.#meshToonMaterial);
+        this.#torus.position.x = -20;
 
         this.#scene.add(this.#torus);
 
@@ -112,5 +112,4 @@ export default class MaterialScene {
         this.#renderer.render(this.#scene, this.camera);
         this.requestAnimationFrameID = window.requestAnimationFrame(() => this.#animate(object, clock))
     }
-
 }
