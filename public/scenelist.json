@@ -21,9 +21,9 @@
             "description": "包含对材质的使用"
         },
         {
-            "id": "debugGUI3",
-            "title": "debugGUI",
-            "description": "包含对立方体的属性控制和场景控制器"
+            "id": "3dText",
+            "title": "3dText",
+            "description": "3d字体场景示例"
         },
         {
             "id": "debugGUI4",

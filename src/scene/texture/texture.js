@@ -153,7 +153,7 @@ export default class TextureScene {
         // object.rotation.x += 0.01;
         // object.rotation.y += 0.01;
         // 渲染器帧渲染场景和相机
-        this.#renderer.render(this.#scene, this.camera);
+        
     }
     //gui controller
     //啧应该用ts的，可以加点类型

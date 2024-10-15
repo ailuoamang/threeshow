@@ -32,4 +32,10 @@ export default class Scene {
         //gui
         this.gui = new GUI({ container: document.getElementById('pannel') });
     }
+    disposeScene(){
+
+    }
+    #animate(){
+        this.#renderer.render(this.#scene, this.camera);
+    }
 }

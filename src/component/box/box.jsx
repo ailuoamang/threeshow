@@ -4,14 +4,15 @@ import RotateMeshScene from '../../scene/rotatemesh/rotateMesh';
 import DebugGUIScene from '../../scene/debugGUI/debugGUI';
 import TextureScene from '../../scene/texture/texture';
 import MaterialScene from '../../scene/material/material';
+import ThreedTextScene from '../../scene/threedText/threedText';
 
 export default function Box({ sceneId }) {
     const rendererRef = useRef(null);
-    const containerRef=useRef(null);
-    const sizeRef=useRef({});
-    const sceneRef=useRef(null);
+    const containerRef = useRef(null);
+    const sizeRef = useRef({});
+    const sceneRef = useRef(null);
 
-    useEffect(()=>{
+    useEffect(() => {
         containerRef.current = document.getElementById('sceneContainer');
         const canvas = document.getElementById('canvas');
         sizeRef.current = {
@@ -21,18 +22,18 @@ export default function Box({ sceneId }) {
         if (rendererRef.current === null) {
             console.log('创建renderer')
             //渲染器
-            rendererRef.current = new THREE.WebGLRenderer({ "canvas": canvas,antialias: true });
+            rendererRef.current = new THREE.WebGLRenderer({ "canvas": canvas, antialias: true });
             rendererRef.current.setSize(sizeRef.current.width, sizeRef.current.height);
             rendererRef.current.setPixelRatio(window.devicePixelRatio);
         }
         return () => {
             console.log('释放gpu资源')
             rendererRef.current.dispose();
-            rendererRef.current=null;
+            rendererRef.current = null;
         };
-    },[])
+    }, [])
     useEffect(() => {
-        if(sceneRef.current) {
+        if (sceneRef.current) {
             console.log('清除上一个scene');
             sceneRef.current.disposeScene();
         }
@@ -45,10 +46,13 @@ export default function Box({ sceneId }) {
                 sceneRef.current = new DebugGUIScene(rendererRef.current);
                 break;
             case "texture":
-                sceneRef.current=new TextureScene(rendererRef.current);
+                sceneRef.current = new TextureScene(rendererRef.current);
                 break;
             case "material":
-                sceneRef.current=new MaterialScene(rendererRef.current);
+                sceneRef.current = new MaterialScene(rendererRef.current);
+                break;
+            case "3dText":
+                sceneRef.current = new ThreedTextScene(rendererRef.current);
                 break;
             default:
                 break;
@@ -75,8 +79,8 @@ export default function Box({ sceneId }) {
         })
     }, [sceneId])
     return (
-        <div id='sceneContainer' style={{ "height": "100%", "width": "100%","position":"relative" }}>
-            <div id='pannel' style={{'position':"absolute","top":"15px","right":"50px"}}></div>
+        <div id='sceneContainer' style={{ "height": "100%", "width": "100%", "position": "relative" }}>
+            <div id='pannel' style={{ 'position': "absolute", "top": "15px", "right": "50px" }}></div>
             <canvas id='canvas' style={{ "height": "100%", "width": "100%" }}></canvas>
         </div>
     )
