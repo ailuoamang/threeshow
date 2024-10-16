@@ -14,6 +14,6 @@ threejs展示项目，适合以scene为基本单元的项目展示，提供了�
 ### 已有场景：
 1.基础场景  
 2.debugui相关  
-3.texture相关 
+3.texture相关  
 4.material相关  
 5....待更新
