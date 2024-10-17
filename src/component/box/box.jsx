@@ -5,6 +5,7 @@ import DebugGUIScene from '../../scene/debugGUI/debugGUI';
 import TextureScene from '../../scene/texture/texture';
 import MaterialScene from '../../scene/material/material';
 import ThreedTextScene from '../../scene/threedText/threedText';
+import PathEditor from '../../scene/pathEditor/pathEditor';
 
 export default function Box({ sceneId }) {
     const rendererRef = useRef(null);
@@ -53,6 +54,9 @@ export default function Box({ sceneId }) {
                 break;
             case "3dText":
                 sceneRef.current = new ThreedTextScene(rendererRef.current);
+                break;
+            case 'pathEditor':
+                sceneRef.current=new PathEditor(rendererRef.current);
                 break;
             default:
                 break;

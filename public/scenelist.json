@@ -26,9 +26,9 @@
             "description": "3d字体场景示例"
         },
         {
-            "id": "debugGUI4",
-            "title": "debugGUI",
-            "description": "包含对立方体的属性控制和场景控制器"
+            "id": "pathEditor",
+            "title": "pathEditor",
+            "description": "路径拖拽生成"
         },
         {
             "id": "debugGUI5",
