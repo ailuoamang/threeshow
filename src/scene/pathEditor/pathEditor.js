@@ -11,6 +11,9 @@ export default class PathEditor {
 
     #gui;
 
+    #orbitControl;
+    #transformControl;
+
     #catmullData;
     #catmullGeometry;
     #catmullMaterial;
@@ -21,7 +24,6 @@ export default class PathEditor {
 
     constructor(render) {
         this.#renderer = render;
-
     }
 
     createScene(size) {
@@ -34,10 +36,10 @@ export default class PathEditor {
         this.camera.position.set(10, 10, 10);
 
         //控制器
-        const orbitControl = new OrbitControls(this.camera, this.#renderer.domElement);
-        orbitControl.update();
-        const transformControl = new TransformControls(this.camera, this.#renderer.domElement);
-        this.#scene.add(transformControl);
+        this.#orbitControl = new OrbitControls(this.camera, this.#renderer.domElement);
+        this.#orbitControl.update();
+        this.#transformControl = new TransformControls(this.camera, this.#renderer.domElement);
+        this.#scene.add(this.#transformControl);
 
         //网格
         const gridSize = 20;
@@ -82,17 +84,42 @@ export default class PathEditor {
         // transformControl.attach(cube2);
         this.#scene.add(cube2)
 
-        //控件
-        const dragcontrols = new DragControls([cube2], this.camera, this.#renderer.domElement);
-        //拖拽控件对象设置鼠标事件
-        dragcontrols.addEventListener('hoveron', function (event) {
-            //控件对象transformControl与选中的对象object绑定
-            transformControl.attach(event.object);
-            
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let isHovering = false;
+        let isMouseDown = false;
+
+        // 鼠标移动事件
+        const canvas = this.#renderer.domElement;
+        window.addEventListener('mousemove', (event) => {
+            const rect = canvas.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            console.log(mouse)
+            raycaster.setFromCamera(mouse, this.camera);//这个坐标特指threejs所使用的canvas
+            const intersects = raycaster.intersectObject(cube2);
+            console.log(intersects)
+
+            // 如果鼠标悬浮并且没有附加 TransformControls，则附加它
+            if (intersects.length > 0) {
+                if (!isHovering) {
+                    isHovering = true;
+                    this.#transformControl.attach(cube2);
+                }
+            }
+
         });
-        dragcontrols.addEventListener('hoveroff', function (event) {
-            //控件对象transformControl与选中的对象object绑定
-            // transformControl.detach();
+        // 监听 TransformControls 的事件
+        this.#transformControl.addEventListener('mouseDown', (event) => {
+            console.log('mouseDown', event);
+            isMouseDown = true;
+            this.#orbitControl.enabled = false;
+        });
+        this.#transformControl.addEventListener('mouseUp', (event) => {
+            console.log('mouseUp', event);
+            isMouseDown = false;
+            this.#orbitControl.enabled = true;
         });
 
         //gui
