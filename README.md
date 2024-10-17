@@ -16,4 +16,6 @@ threejs展示项目，适合以scene为基本单元的项目展示，提供了�
 2.debugui相关  
 3.texture相关  
 4.material相关  
-5....待更新
+5.3dText相关
+6.控制器相关
+7....待更新
