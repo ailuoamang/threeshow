@@ -13,6 +13,7 @@ export default class PathEditor {
     #orbitControl;
     #transformControl;
 
+    #originalVector;//vector数据
     #catmullData;
     #catmullGeometry;
     #catmullMaterial;
@@ -21,10 +22,16 @@ export default class PathEditor {
     #boxGeometry;
     #boxMaterial;
 
-    #aimPointer;
+    #aimPointer;//当前选中点
 
     constructor(render) {
         this.#renderer = render;
+        this.#originalVector = [
+            new THREE.Vector3(-5, 0, 5),
+            new THREE.Vector3(-5, 5, 5),
+            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(5, -5, 5)
+        ]
     }
 
     createScene(size) {
@@ -52,14 +59,9 @@ export default class PathEditor {
         //卡特穆尔样条
         //增加addPoint功能，在某个范围内随机产生point，悬浮到point上显示transformcontrol,切换绑定的point
         //拖拽结束后,如何更新整个卡特穆尔样条呢？
-        const originalVector = [
-            new THREE.Vector3(-5, 0, 5),
-            new THREE.Vector3(-5, 5, 5),
-            new THREE.Vector3(0, 0, 0),
-            new THREE.Vector3(5, -5, 5)
-        ]
 
-        this.#catmullData = new THREE.CatmullRomCurve3(originalVector);
+
+        this.#catmullData = new THREE.CatmullRomCurve3(this.#originalVector);
         //插值点可以参数化
         const points = this.#catmullData.getPoints(50);
         this.#catmullGeometry = new THREE.BufferGeometry().setFromPoints(points);
@@ -70,13 +72,13 @@ export default class PathEditor {
         //初始卡特穆尔设置四个移动点
         //悬浮高亮
         //之后在限定范围内添加随机点，然后更新样条
-        for (let i = 0; i < originalVector.length; i++) {
-            const vector3 = originalVector[i];
+        for (let i = 0; i < this.#originalVector.length; i++) {
+            const vector3 = this.#originalVector[i];
             //这里每一个都必须创建一个新的geometry，因为后面需要改变position
             this.#boxGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
             this.#boxMaterial = new THREE.MeshBasicMaterial({ color: "#C762B0" });
             const cube = new THREE.Mesh(this.#boxGeometry, this.#boxMaterial);
-            cube.name='editorPoint';
+            cube.name = `editorPoint-${i}`;
             cube.position.set(...vector3);
             this.#scene.add(cube)
         }
@@ -98,10 +100,10 @@ export default class PathEditor {
             console.log(intersects)
 
             if (intersects.length <= 0) return;
-            const result= this.#hasEditorPointer(intersects);
-            if(!result[0]) return;
+            const result = this.#hasEditorPointer(intersects);
+            if (!result[0]) return;
             console.log('拾取到了可标记点');
-            this.#aimPointer=result[1];
+            this.#aimPointer = result[1];
             this.#transformControl.attach(result[1]);
         });
         // 监听 TransformControls 的事件
@@ -114,7 +116,16 @@ export default class PathEditor {
             this.#orbitControl.enabled = true;
         });
         this.#transformControl.addEventListener('objectChange', (event) => {
-            console.log('objectChange',this.#aimPointer.position);
+            console.log('objectChange', this.#aimPointer.position);
+            //在移动点位的时候，更新卡特穆尔曲线的geometry
+            console.log('mesh',this.#catmullMesh)
+            const nameSplitArray = this.#aimPointer.name.split('-');
+            const index = Number(nameSplitArray[1]);
+            this.#originalVector[index] = this.#aimPointer.position.clone();
+            this.#catmullData = new THREE.CatmullRomCurve3(this.#originalVector);
+            const points = this.#catmullData.getPoints(50);
+            this.#catmullGeometry = new THREE.BufferGeometry().setFromPoints(points);
+            this.#catmullMesh.geometry=this.#catmullGeometry;
 
         });
 
@@ -126,8 +137,7 @@ export default class PathEditor {
 
     //我现在需要就是说，
     //editor点需要添加顺序id
-    //在移动点位的时候，更新卡特穆尔曲线的geometry
-    #createCatmull(vectorArray){
+    #createCatmull(vectorArray) {
         this.#catmullData = new THREE.CatmullRomCurve3(vectorArray);
         //插值点可以参数化
         const points = this.#catmullData.getPoints(50);
@@ -135,17 +145,17 @@ export default class PathEditor {
         this.#catmullMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
     }
 
-    #hasEditorPointer(array){
-        let flag=false
-        let editorPoint=null;
+    #hasEditorPointer(array) {
+        let flag = false
+        let editorPoint = null;
         for (let i = 0; i < array.length; i++) {
             const element = array[i];
-            if(element.object.name==='editorPoint'){
-                flag=true;
-                editorPoint=element.object;
-            }            
+            if (element.object.name.indexOf('editorPoint') !== -1) {
+                flag = true;
+                editorPoint = element.object;
+            }
         }
-        return [flag,editorPoint];
+        return [flag, editorPoint];
     }
 
     disposeScene() {
