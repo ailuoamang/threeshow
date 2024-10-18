@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import GUI from 'lil-gui';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
-import { DragControls } from 'three/addons/controls/DragControls.js';
 
 export default class PathEditor {
     #renderer;
@@ -21,6 +20,8 @@ export default class PathEditor {
 
     #boxGeometry;
     #boxMaterial;
+
+    #aimPointer;
 
     constructor(render) {
         this.#renderer = render;
@@ -71,23 +72,18 @@ export default class PathEditor {
         //之后在限定范围内添加随机点，然后更新样条
         for (let i = 0; i < originalVector.length; i++) {
             const vector3 = originalVector[i];
+            //这里每一个都必须创建一个新的geometry，因为后面需要改变position
             this.#boxGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
             this.#boxMaterial = new THREE.MeshBasicMaterial({ color: "#C762B0" });
             const cube = new THREE.Mesh(this.#boxGeometry, this.#boxMaterial);
+            cube.name='editorPoint';
             cube.position.set(...vector3);
             this.#scene.add(cube)
         }
 
-        //测试
-        const cube2 = new THREE.Mesh(this.#boxGeometry, this.#boxMaterial);
-        cube2.position.set(0, 0, 4);
-        // transformControl.attach(cube2);
-        this.#scene.add(cube2)
-
+        //射线拾取特定cube添加transformControl
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
-        let isHovering = false;
-        let isMouseDown = false;
 
         // 鼠标移动事件
         const canvas = this.#renderer.domElement;
@@ -98,34 +94,58 @@ export default class PathEditor {
 
             console.log(mouse)
             raycaster.setFromCamera(mouse, this.camera);//这个坐标特指threejs所使用的canvas
-            const intersects = raycaster.intersectObject(cube2);
+            const intersects = raycaster.intersectObjects(this.#scene.children);
             console.log(intersects)
 
-            // 如果鼠标悬浮并且没有附加 TransformControls，则附加它
-            if (intersects.length > 0) {
-                if (!isHovering) {
-                    isHovering = true;
-                    this.#transformControl.attach(cube2);
-                }
-            }
-
+            if (intersects.length <= 0) return;
+            const result= this.#hasEditorPointer(intersects);
+            if(!result[0]) return;
+            console.log('拾取到了可标记点');
+            this.#aimPointer=result[1];
+            this.#transformControl.attach(result[1]);
         });
         // 监听 TransformControls 的事件
         this.#transformControl.addEventListener('mouseDown', (event) => {
             console.log('mouseDown', event);
-            isMouseDown = true;
             this.#orbitControl.enabled = false;
         });
         this.#transformControl.addEventListener('mouseUp', (event) => {
             console.log('mouseUp', event);
-            isMouseDown = false;
             this.#orbitControl.enabled = true;
+        });
+        this.#transformControl.addEventListener('objectChange', (event) => {
+            console.log('objectChange',this.#aimPointer.position);
+
         });
 
         //gui
         this.#gui = new GUI({ container: document.getElementById('pannel') });
 
         this.#renderer.setAnimationLoop(() => this.#animate());
+    }
+
+    //我现在需要就是说，
+    //editor点需要添加顺序id
+    //在移动点位的时候，更新卡特穆尔曲线的geometry
+    #createCatmull(vectorArray){
+        this.#catmullData = new THREE.CatmullRomCurve3(vectorArray);
+        //插值点可以参数化
+        const points = this.#catmullData.getPoints(50);
+        this.#catmullGeometry = new THREE.BufferGeometry().setFromPoints(points);
+        this.#catmullMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    }
+
+    #hasEditorPointer(array){
+        let flag=false
+        let editorPoint=null;
+        for (let i = 0; i < array.length; i++) {
+            const element = array[i];
+            if(element.object.name==='editorPoint'){
+                flag=true;
+                editorPoint=element.object;
+            }            
+        }
+        return [flag,editorPoint];
     }
 
     disposeScene() {
