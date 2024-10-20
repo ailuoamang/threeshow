@@ -31,9 +31,9 @@
             "description": "路径拖拽生成"
         },
         {
-            "id": "debugGUI5",
-            "title": "debugGUI",
-            "description": "包含对立方体的属性控制和场景控制器"
+            "id": "hauntedHouse",
+            "title": "hauntedHouse",
+            "description": "猎人小屋测试灯光与阴影"
         },
         {
             "id": "debugGUI6",
