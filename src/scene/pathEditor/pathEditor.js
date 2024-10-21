@@ -13,6 +13,8 @@ export default class PathEditor {
     #orbitControl;
     #transformControl;
 
+    #gridHelper;
+
     #originalVector;//vector数据
     #catmullData;
     #catmullGeometry;
@@ -53,17 +55,14 @@ export default class PathEditor {
         const gridSize = 20;
         const divisions = 20;
 
-        const gridHelper = new THREE.GridHelper(gridSize, divisions);
-        this.#scene.add(gridHelper);
+        this.#gridHelper = new THREE.GridHelper(gridSize, divisions);
+        this.#scene.add(this.#gridHelper);
 
         //卡特穆尔样条
         //增加addPoint功能，在某个范围内随机产生point，悬浮到point上显示transformcontrol,切换绑定的point
-        //拖拽结束后,如何更新整个卡特穆尔样条呢？
-
-
+        //拖拽结束后,更新整个卡特穆尔样条
         this.#catmullData = new THREE.CatmullRomCurve3(this.#originalVector);
-        //插值点可以参数化
-        const points = this.#catmullData.getPoints(50);
+        const points = this.#catmullData.getPoints(100);
         this.#catmullGeometry = new THREE.BufferGeometry().setFromPoints(points);
         this.#catmullMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
         this.#catmullMesh = new THREE.Line(this.#catmullGeometry, this.#catmullMaterial);
@@ -72,11 +71,11 @@ export default class PathEditor {
         //初始卡特穆尔设置四个移动点
         //悬浮高亮
         //之后在限定范围内添加随机点，然后更新样条
+        this.#boxMaterial = new THREE.MeshBasicMaterial({ color: "#C762B0" });
         for (let i = 0; i < this.#originalVector.length; i++) {
             const vector3 = this.#originalVector[i];
             //这里每一个都必须创建一个新的geometry，因为后面需要改变position
             this.#boxGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
-            this.#boxMaterial = new THREE.MeshBasicMaterial({ color: "#C762B0" });
             const cube = new THREE.Mesh(this.#boxGeometry, this.#boxMaterial);
             cube.name = `editorPoint-${i}`;
             cube.position.set(...vector3);
@@ -118,31 +117,44 @@ export default class PathEditor {
         this.#transformControl.addEventListener('objectChange', (event) => {
             console.log('objectChange', this.#aimPointer.position);
             //在移动点位的时候，更新卡特穆尔曲线的geometry
-            console.log('mesh',this.#catmullMesh)
+            console.log('mesh', this.#catmullMesh)
             const nameSplitArray = this.#aimPointer.name.split('-');
             const index = Number(nameSplitArray[1]);
             this.#originalVector[index] = this.#aimPointer.position.clone();
             this.#catmullData = new THREE.CatmullRomCurve3(this.#originalVector);
-            const points = this.#catmullData.getPoints(50);
-            this.#catmullGeometry = new THREE.BufferGeometry().setFromPoints(points);
-            this.#catmullMesh.geometry=this.#catmullGeometry;
-
+            this.#updateCatmull();
         });
 
-        //gui
-        this.#gui = new GUI({ container: document.getElementById('pannel') });
+        //gui   
+        const guiParam = {
+            addPoint: () => {
+                const x = ((Math.random() * 2) - 1) * 10;
+                const y = ((Math.random() * 2) - 1) * 10;
+                const z = ((Math.random() * 2) - 1) * 10;
+                this.#originalVector.push(new THREE.Vector3(x, y, z));
+                //曲线更新
+                this.#catmullData = new THREE.CatmullRomCurve3(this.#originalVector);
+                this.#updateCatmull();
 
+                //box
+                this.#boxGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
+                const cube = new THREE.Mesh(this.#boxGeometry, this.#boxMaterial);
+                cube.name = `editorPoint-${this.#originalVector.length - 1}`;
+                cube.position.set(...this.#originalVector.at(-1));
+                this.#scene.add(cube)
+            }
+        }
+        this.#gui = new GUI({ container: document.getElementById('pannel') });
+        this.#gui.add(guiParam, 'addPoint');
         this.#renderer.setAnimationLoop(() => this.#animate());
     }
 
     //我现在需要就是说，
     //editor点需要添加顺序id
-    #createCatmull(vectorArray) {
-        this.#catmullData = new THREE.CatmullRomCurve3(vectorArray);
-        //插值点可以参数化
-        const points = this.#catmullData.getPoints(50);
+    #updateCatmull() {
+        const points = this.#catmullData.getPoints(100);
         this.#catmullGeometry = new THREE.BufferGeometry().setFromPoints(points);
-        this.#catmullMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+        this.#catmullMesh.geometry = this.#catmullGeometry;
     }
 
     #hasEditorPointer(array) {
@@ -159,6 +171,15 @@ export default class PathEditor {
     }
 
     disposeScene() {
+        this.#catmullMesh;
+        this.#catmullMaterial;
+        this.#catmullGeometry;
+
+        //boxmesh没删
+        this.#boxGeometry;
+        this.#boxMaterial;
+
+        this.#gridHelper.destroy();
         this.#gui.destroy();
     }
 
