@@ -25,6 +25,7 @@ export default class PathEditor {
     #boxMaterial;
 
     #aimPointer;//当前选中点
+    #points;
 
     constructor(render) {
         this.#renderer = render;
@@ -62,8 +63,8 @@ export default class PathEditor {
         //增加addPoint功能，在某个范围内随机产生point，悬浮到point上显示transformcontrol,切换绑定的point
         //拖拽结束后,更新整个卡特穆尔样条
         this.#catmullData = new THREE.CatmullRomCurve3(this.#originalVector);
-        const points = this.#catmullData.getPoints(100);
-        this.#catmullGeometry = new THREE.BufferGeometry().setFromPoints(points);
+        this.#points = this.#catmullData.getPoints(100);
+        this.#catmullGeometry = new THREE.BufferGeometry().setFromPoints(this.#points);
         this.#catmullMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
         this.#catmullMesh = new THREE.Line(this.#catmullGeometry, this.#catmullMaterial);
         this.#scene.add(this.#catmullMesh);
@@ -93,10 +94,10 @@ export default class PathEditor {
             mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
             mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-            console.log(mouse)
+            // console.log(mouse)
             raycaster.setFromCamera(mouse, this.camera);//这个坐标特指threejs所使用的canvas
             const intersects = raycaster.intersectObjects(this.#scene.children);
-            console.log(intersects)
+            // console.log(intersects)
 
             if (intersects.length <= 0) return;
             const result = this.#hasEditorPointer(intersects);
@@ -107,17 +108,17 @@ export default class PathEditor {
         });
         // 监听 TransformControls 的事件
         this.#transformControl.addEventListener('mouseDown', (event) => {
-            console.log('mouseDown', event);
+            // console.log('mouseDown', event);
             this.#orbitControl.enabled = false;
         });
         this.#transformControl.addEventListener('mouseUp', (event) => {
-            console.log('mouseUp', event);
+            // console.log('mouseUp', event);
             this.#orbitControl.enabled = true;
         });
         this.#transformControl.addEventListener('objectChange', (event) => {
-            console.log('objectChange', this.#aimPointer.position);
+            // console.log('objectChange', this.#aimPointer.position);
             //在移动点位的时候，更新卡特穆尔曲线的geometry
-            console.log('mesh', this.#catmullMesh)
+            // console.log('mesh', this.#catmullMesh)
             const nameSplitArray = this.#aimPointer.name.split('-');
             const index = Number(nameSplitArray[1]);
             this.#originalVector[index] = this.#aimPointer.position.clone();
@@ -142,18 +143,37 @@ export default class PathEditor {
                 cube.name = `editorPoint-${this.#originalVector.length - 1}`;
                 cube.position.set(...this.#originalVector.at(-1));
                 this.#scene.add(cube)
+            },
+            savePoint: () => {
+                let array = [];
+                for (let i = 0; i < this.#points.length; i++) {
+                    const vector = this.#points[i];
+                    array.push(vector.toArray());
+                }
+                console.log(array);
+                const json = { 'points': array };
+                const blob = new Blob([JSON.stringify(json, null, 2)], {
+                    type: "application/json"
+                })
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `points.json`;
+                a.click();
+                URL.revokeObjectURL(url);
             }
         }
         this.#gui = new GUI({ container: document.getElementById('pannel') });
         this.#gui.add(guiParam, 'addPoint');
+        this.#gui.add(guiParam, 'savePoint');
         this.#renderer.setAnimationLoop(() => this.#animate());
     }
 
     //我现在需要就是说，
     //editor点需要添加顺序id
     #updateCatmull() {
-        const points = this.#catmullData.getPoints(100);
-        this.#catmullGeometry = new THREE.BufferGeometry().setFromPoints(points);
+        this.#points = this.#catmullData.getPoints(100);
+        this.#catmullGeometry = new THREE.BufferGeometry().setFromPoints(this.#points);
         this.#catmullMesh.geometry = this.#catmullGeometry;
     }
 
