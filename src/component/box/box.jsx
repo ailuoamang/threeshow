@@ -6,6 +6,7 @@ import TextureScene from '../../scene/texture/texture';
 import MaterialScene from '../../scene/material/material';
 import ThreedTextScene from '../../scene/threedText/threedText';
 import PathEditor from '../../scene/pathEditor/pathEditor';
+import HauntedHouse from '../../scene/hauntedHouse/hauntedHouse';
 
 export default function Box({ sceneId }) {
     const rendererRef = useRef(null);
@@ -26,6 +27,9 @@ export default function Box({ sceneId }) {
             rendererRef.current = new THREE.WebGLRenderer({ "canvas": canvas, antialias: true });
             rendererRef.current.setSize(sizeRef.current.width, sizeRef.current.height);
             rendererRef.current.setPixelRatio(window.devicePixelRatio);
+            //开启阴影
+            rendererRef.current.shadowMap.enabled = true
+            rendererRef.current.shadowMap.type = THREE.PCFSoftShadowMap
         }
         return () => {
             console.log('释放gpu资源')
@@ -56,8 +60,10 @@ export default function Box({ sceneId }) {
                 sceneRef.current = new ThreedTextScene(rendererRef.current);
                 break;
             case 'pathEditor':
-                sceneRef.current=new PathEditor(rendererRef.current);
+                sceneRef.current = new PathEditor(rendererRef.current);
                 break;
+            case 'hauntedHouse':
+                sceneRef.current = new HauntedHouse(rendererRef.current);
             default:
                 break;
         }

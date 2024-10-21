@@ -191,15 +191,14 @@ export default class PathEditor {
     }
 
     disposeScene() {
-        this.#catmullMesh;
-        this.#catmullMaterial;
-        this.#catmullGeometry;
+        this.#catmullMaterial.dispose();
+        this.#catmullGeometry.dispose();
 
         //boxmesh没删
-        this.#boxGeometry;
-        this.#boxMaterial;
+        this.#boxGeometry.dispose();
+        this.#boxMaterial.dispose();
 
-        this.#gridHelper.destroy();
+        this.#gridHelper.dispose();
         this.#gui.destroy();
     }
 
