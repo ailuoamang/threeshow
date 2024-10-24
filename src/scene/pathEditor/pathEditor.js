@@ -63,7 +63,7 @@ export default class PathEditor {
         //增加addPoint功能，在某个范围内随机产生point，悬浮到point上显示transformcontrol,切换绑定的point
         //拖拽结束后,更新整个卡特穆尔样条
         this.#catmullData = new THREE.CatmullRomCurve3(this.#originalVector);
-        this.#points = this.#catmullData.getPoints(100);
+        this.#points = this.#catmullData.getPoints(50);
         this.#catmullGeometry = new THREE.BufferGeometry().setFromPoints(this.#points);
         this.#catmullMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
         this.#catmullMesh = new THREE.Line(this.#catmullGeometry, this.#catmullMaterial);
@@ -172,7 +172,7 @@ export default class PathEditor {
     //我现在需要就是说，
     //editor点需要添加顺序id
     #updateCatmull() {
-        this.#points = this.#catmullData.getPoints(100);
+        this.#points = this.#catmullData.getPoints(50);
         this.#catmullGeometry = new THREE.BufferGeometry().setFromPoints(this.#points);
         this.#catmullMesh.geometry = this.#catmullGeometry;
     }
