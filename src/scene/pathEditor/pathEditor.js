@@ -107,15 +107,15 @@ export default class PathEditor {
             this.#transformControl.attach(result[1]);
         });
         // 监听 TransformControls 的事件
-        this.#transformControl.addEventListener('mouseDown', (event) => {
+        this.#transformControl.addEventListener('mouseDown', () => {
             // console.log('mouseDown', event);
             this.#orbitControl.enabled = false;
         });
-        this.#transformControl.addEventListener('mouseUp', (event) => {
+        this.#transformControl.addEventListener('mouseUp', () => {
             // console.log('mouseUp', event);
             this.#orbitControl.enabled = true;
         });
-        this.#transformControl.addEventListener('objectChange', (event) => {
+        this.#transformControl.addEventListener('objectChange', () => {
             // console.log('objectChange', this.#aimPointer.position);
             //在移动点位的时候，更新卡特穆尔曲线的geometry
             // console.log('mesh', this.#catmullMesh)

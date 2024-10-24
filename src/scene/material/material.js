@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import GUI from 'lil-gui';
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 // 这个场景使用requestAnimationFrame来实现动画，以作参考

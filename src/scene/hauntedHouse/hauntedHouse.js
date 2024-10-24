@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import GUI from 'lil-gui';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 //这里没有设置render.clearColor 来增加沉浸感
@@ -25,7 +24,7 @@ export default class HauntedHouse {
 
   constructor(render) {
     this.#renderer = render;
-  };
+  }
   createScene(size) {
     console.log(99)
     this.#scene = new THREE.Scene();
@@ -231,9 +230,9 @@ export default class HauntedHouse {
 
     const clock = new THREE.Clock()
     this.#renderer.setAnimationLoop(() => this.#animate(clock))
-  };
+  }
   disposeScene() {
-  };
+  }
   #animate(clock) {
     const elapsedTime = clock.getElapsedTime()
 

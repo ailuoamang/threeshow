@@ -149,7 +149,7 @@ export default class TextureScene {
         this.#leatherDiamondPatchesMaterial.dispose();
         this.#gui.destroy();
     }
-    #animate(object) {
+    #animate() {
         // object.rotation.x += 0.01;
         // object.rotation.y += 0.01;
         // 渲染器帧渲染场景和相机
