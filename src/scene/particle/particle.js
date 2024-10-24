@@ -1,9 +1,8 @@
-//当个快速模板吧
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import GUI from 'lil-gui';
 
-export default class Scene {
+export default class ParticleScene {
     #renderer;
     #scene;
     camera;
@@ -42,7 +41,9 @@ export default class Scene {
         this.gui = new GUI({ container: document.getElementById('pannel') });
     }
     disposeScene(){
-
+        console.log('清除');
+        this.#boxGeometry.dispose();
+        this.#boxMaterial.dispose();
     }
     #animate(){
         this.#renderer.render(this.#scene, this.camera);

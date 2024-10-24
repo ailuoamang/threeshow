@@ -7,6 +7,7 @@ import MaterialScene from '../../scene/material/material';
 import ThreedTextScene from '../../scene/threedText/threedText';
 import PathEditor from '../../scene/pathEditor/pathEditor';
 import HauntedHouse from '../../scene/hauntedHouse/hauntedHouse';
+import ParticleScene from '../../scene/particle/particle';
 
 export default function Box({ sceneId }) {
     const rendererRef = useRef(null);
@@ -64,6 +65,10 @@ export default function Box({ sceneId }) {
                 break;
             case 'hauntedHouse':
                 sceneRef.current = new HauntedHouse(rendererRef.current);
+                break
+            case 'particle':
+                sceneRef.current=new ParticleScene(rendererRef.current);
+                break;
             default:
                 break;
         }

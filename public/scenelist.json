@@ -36,9 +36,9 @@
             "description": "猎人小屋测试灯光与阴影"
         },
         {
-            "id": "debugGUI6",
-            "title": "debugGUI",
-            "description": "包含对立方体的属性控制和场景控制器"
+            "id": "particle",
+            "title": "particle",
+            "description": "粒子系统"
         },
         {
             "id": "debugGUI7",
